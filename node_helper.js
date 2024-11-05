@@ -89,7 +89,8 @@ module.exports = NodeHelper.create(
                         for (trip of trips) {
                             if (query.direction === undefined || query.direction == trip.direction_id) {
                                 // Now we have the stop and all the trips.
-                                const stopDays = this.gtfs.getCalendars({ service_id: trip.service_id });
+                                const stopDays = this.gtfs.getCalendarDates({ service_id: trip.service_id });
+                                // const stopDays = this.gtfs.getCalendars({ service_id: trip.service_id });
                                 const stoptime = this.gtfs.getStoptimes({ trip_id: trip.trip_id, stop_id: stop.stop_id }, ['departure_time', 'stop_sequence']);
 
                                 // If stopDays is undefined, the calendar lookup failed.
@@ -198,21 +199,87 @@ function delayFromStopTimeUpdate(stop_time, update) {
         return null;
     return delay;
 }
-
-
-function makeStopDatetimes(calendar_dates, stop_time) {
+function makeStopDatetimes(calendar_date, stop_time) {
     const departures = [];
+    const currentDate = new Date();
+    const time = new Date('2000-01-01T' + stop_time);  // Parse time without a specific date
 
-    const time = new Date('2000-01-01T' + stop_time);
-    for (const date of calendar_dates) {
-        const departure = new Date(date.date.toString().slice(0, 4), date.date.toString().slice(4, 6) - 1, date.date.toString().slice(6, 8));
-        departure.setHours(time.getHours());
-        departure.setMinutes(time.getMinutes());
-        departure.setSeconds(time.getSeconds());
+    console.log("Current date:", currentDate);
+    console.log("Stop time:", stop_time);
+    console.log("calendar_date:", calendar_date);  // Log single calendar_date object for debugging
 
-        departures.push(departure);
-
-
+    // Ensure calendar_date has a valid date property
+    if (!calendar_date.date) {
+        console.error("No date found in calendar_date");
         return departures;
     }
+
+    // Parse the date from YYYYMMDD format
+    const year = parseInt(calendar_date.date.toString().slice(0, 4));
+    const month = parseInt(calendar_date.date.toString().slice(4, 6)) - 1;  // Months are zero-indexed
+    const day = parseInt(calendar_date.date.toString().slice(6, 8));
+
+    const departureDate = new Date(year, month, day);
+
+    // Check if the date is within the next 3 days
+    console.log(departureDate)
+    const daysDifference = (departureDate - currentDate) / (1000 * 60 * 60 * 24);
+    if (daysDifference >= 0 && daysDifference <= 3) {
+        // Set the stop_time on the date
+        departureDate.setHours(time.getHours());
+        departureDate.setMinutes(time.getMinutes());
+        departureDate.setSeconds(time.getSeconds());
+
+        console.log("Adding departure:", departureDate);  // Debugging log
+        departures.push(departureDate);
+    } else {
+        console.log("Skipping date:", departureDate);  // Debugging log for dates outside range
+    }
+
+    console.log("Final departures array:", departures);  // Log final list of departures
+    return departures;
 }
+
+
+
+
+// function makeStopDatetimes(stop_days, stop_time) {
+//     // This accepts a GTFS calendar and a stop time
+//     // and creates Date objects for the next few days of arrivals.
+//     // Start/end dates are ignored for calendars, as are holidays.
+//     //
+//     // Format reference
+//     //stop_time: '09:43:00'
+//     //stop_days: {
+//     //   service_id: 'M3',
+//     //   monday: 0,
+//     //   tuesday: 0,
+//     //   wednesday: 0,
+//     //   thursday: 0,
+//     //   friday: 0,
+//     //   saturday: 0,
+//     //   sunday: 1,
+//     //   start_date: 20220821,
+//     //   end_date: 20230304
+//     // },
+
+//     const departures = [];
+
+//     // Create a Date with today's date and stop_time for the time.
+//     const dateCandidate = new Date(Date.now());
+//     const time = new Date('2000-01-01T' + stop_time)
+//     dateCandidate.setHours(time.getHours());
+//     dateCandidate.setMinutes(time.getMinutes());
+//     dateCandidate.setSeconds(time.getSeconds());
+
+//     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+//     for (let i = 0; i < 2; i++) {
+//         const dayofweek = days[dateCandidate.getDay()];
+//         if (stop_days[dayofweek] == 1)
+//             departures.push(new Date(dateCandidate));
+
+//         dateCandidate.setDate(dateCandidate.getDate() + 1)
+//     }
+//     return departures;
+// }
