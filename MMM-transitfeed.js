@@ -20,8 +20,8 @@ Module.register("MMM-transitfeed", {
                 // These are SEPTA regional rail routes. Go to transitfeeds.com
                 // or your transit agency's site to find local GTFS data.
                 {
-                    "url": "https://www3.septa.org/developer/google_rail.zip",
-                    "realtimeUrls": ["https://www3.septa.org/gtfsrt/septarail-pa-us/Trip/rtTripUpdates.pb"],
+                    "url": "https://rrgtfsfeeds.s3.amazonaws.com/gtfsmnr.zip",
+                    // "realtimeUrls": ["https://www3.septa.org/gtfsrt/septarail-pa-us/Trip/rtTripUpdates.pb"],
                     // Excluding shapes makes loading faster.
                     exclude: ['shapes']
                 },
@@ -33,9 +33,9 @@ Module.register("MMM-transitfeed", {
 
         // Route + station pairs to monitor for departures
         queries: [
-            {route_name: "West Trenton", stop_name: "30th"},
-            {route_name: "Warminster", stop_name: "Warminster", direction: 1},
-            {stop_name: "Norristown", direction: 1},
+            { route_name: "West Trenton", stop_name: "30th" },
+            { route_name: "Warminster", stop_name: "Warminster", direction: 1 },
+            { stop_name: "Norristown", direction: 1 },
         ],
         departuresPerRoute: 3,
         // Switch from showing clock time (12:35) to relative time (22) X
@@ -81,7 +81,7 @@ Module.register("MMM-transitfeed", {
 
     getDom: function () {
         // Fake trip for comparison purposes
-        let lastTrip = {trip_terminus: '', route_name: '', stop_name: '', direction:-1};
+        let lastTrip = { trip_terminus: '', route_name: '', stop_name: '', direction: -1 };
         let row;
         let departureCount = 0;
 
@@ -130,7 +130,7 @@ Module.register("MMM-transitfeed", {
             // Don't show trips that have departed.
             var departure = trip.stop_time.getTime();
             if (trip.stop_delay !== null) {
-                departure = new Date(trip.stop_time.getTime() + trip.stop_delay*1000);
+                departure = new Date(trip.stop_time.getTime() + trip.stop_delay * 1000);
             }
             if (departure < Date.now()) continue;
 
@@ -142,17 +142,17 @@ Module.register("MMM-transitfeed", {
             let departure_time = row.insertCell();
 
             if (this.config.showTimeEstimated && trip.stop_delay !== null) {
-                trip.stop_time = new Date(trip.stop_time.getTime() + trip.stop_delay*1000);
+                trip.stop_time = new Date(trip.stop_time.getTime() + trip.stop_delay * 1000);
             }
 
             let minutes = ((trip.stop_time - Date.now()) / 1000 / 60).toFixed();
             if (minutes < this.config.showTimeFromNow)
                 departure_time.innerHTML = minutes;
             else
-                departure_time.innerHTML = trip.stop_time.toTimeString().slice(0,5);
-                // Never show a leading 0 in hours field.
-                if (departure_time.innerHTML[0] == '0')
-                    departure_time.innerHTML = departure_time.innerHTML.slice(1,5);
+                departure_time.innerHTML = trip.stop_time.toTimeString().slice(0, 5);
+            // Never show a leading 0 in hours field.
+            if (departure_time.innerHTML[0] == '0')
+                departure_time.innerHTML = departure_time.innerHTML.slice(1, 5);
 
             if (trip.stop_delay !== null)
                 departure_time.style.color = this.config.liveTrackingColor;
@@ -165,7 +165,7 @@ Module.register("MMM-transitfeed", {
                 var start = "<span style=vertical-align:top;font-size:70%>";
                 if (trip.stop_delay >= 0)
                     start += "+";
-                departure_time.innerHTML = start + (trip.stop_delay/60).toFixed() + "</span>" + departure_time.innerHTML;
+                departure_time.innerHTML = start + (trip.stop_delay / 60).toFixed() + "</span>" + departure_time.innerHTML;
             }
 
             // Show the next departure bolder than the rest.
@@ -181,7 +181,7 @@ Module.register("MMM-transitfeed", {
         return this.wrapper;
     },
 
-    socketNotificationReceived: async function(notification, payload) {
+    socketNotificationReceived: async function (notification, payload) {
         // Once the GTFS data is all imported, resolve our queries.
         if (notification == "GTFS_READY") {
             // Update from "Loading GTFS" to "No trips found"
@@ -190,9 +190,9 @@ Module.register("MMM-transitfeed", {
             // Set up the helper to send us data.
             Log.log("MMM-transitfeed: Querying");
             Log.log(this.config.queries);
-            for (query of this.config.queries) { 
+            for (query of this.config.queries) {
                 this.sendSocketNotification("GTFS_QUERY_SEARCH",
-                                            {'gtfs_config': this.config.gtfs_config, 'query': query});
+                    { 'gtfs_config': this.config.gtfs_config, 'query': query });
             }
             this.sendSocketNotification("GTFS_BROADCAST");
         }
@@ -204,7 +204,7 @@ Module.register("MMM-transitfeed", {
         }
     },
 
-    updateDepartures: function(trips) {
+    updateDepartures: function (trips) {
         Log.log("MMM-transitfeed: " + trips.length + " trips in queue");
 
         sortFunc = (one, two) => {
@@ -245,14 +245,14 @@ Module.register("MMM-transitfeed", {
         // Cull trips from the past
         // (More than 15m ago to allow for realtime updates)
         this.trips = trips.filter(
-            trip => (trip.stop_time - Date.now()) > -(15*60)*1000);
+            trip => (trip.stop_time - Date.now()) > -(15 * 60) * 1000);
         Log.log("Filtered to", this.trips.length);
 
         this.updateDom();
         this.updateDom();
     },
 
-    tr: function(text) {
+    tr: function (text) {
         for (const [word, wd] of Object.entries(this.config.replace)) {
             text = text.replace(word, wd);
         }

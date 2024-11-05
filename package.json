@@ -4,21 +4,26 @@
     "description": "Module for MagicMirror² to display upcoming transit departures for most agencies. Can filter by station, line, direction, and more.",
     "main": "MMM-transitfeed.js",
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/bnitkin/MMM-transitfeed.git"
+        "type": "git",
+        "url": "git+https://github.com/bnitkin/MMM-transitfeed.git"
     },
     "keywords": [
-      "MagicMirror",
-      "transit",
-      "gtfs",
-      "travel",
-      "public transport",
-      "train", "bus", "subway"
+        "MagicMirror",
+        "transit",
+        "gtfs",
+        "travel",
+        "public transport",
+        "train",
+        "bus",
+        "subway"
     ],
     "author": "bnitkin",
     "license": "MIT",
     "bugs": {
-      "url": "https://github.com/bnitkin/MMM-transitfeed/issues"
+        "url": "https://github.com/bnitkin/MMM-transitfeed/issues"
     },
-    "homepage": "https://github.com/bnitkin/MMM-transitfeed"
-  }
+    "homepage": "https://github.com/bnitkin/MMM-transitfeed",
+    "dependencies": {
+        "gtfs": "^4.15.6"
+    }
+}
