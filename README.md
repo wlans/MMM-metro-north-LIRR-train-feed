@@ -1,4 +1,6 @@
-# Module: MMM-transitfeed
+# Module: MMM-metro-north-LIRR-train-feed
+
+ Credit to Ben Nitkin for init work on transitfeeds
 
 ![Screenshot](/res/screenshot.png?raw=true "Screenshot of module")
 
@@ -39,7 +41,7 @@ This release requires updates:
 Installation is pretty standard:
 ```
 # Clone the module into your `modules/` directory:
-git clone https://github.com/bnitkin/MMM-transitfeed.git
+git clone https://github.com/bnitkin/MMM-metro-north-LIRR-train-feed.git
 
 # Install the gtfs parsing library
 npm install gtfs

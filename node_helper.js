@@ -1,9 +1,9 @@
 /* MagicMirror²
- * Module: MMM-transitfeed
+ * Module: MMM-metro-north-LIRR-train-feed
  * A generic transit parser to display upcoming departures
  * for a selected set of lines
  *
- * By Ben Nitkin
+ * By Wyatt Lansdale. Credit to Ben Nitkin for transitfeeds
  * MIT Licensed.
  */
 
@@ -29,7 +29,7 @@ module.exports = NodeHelper.create(
             while (this.busy) await new Promise(r => setTimeout(r, 100));
             this.busy = true;
 
-            Log.log("MMM-transitfeed: helper recieved", notification, payload);
+            Log.log("MMM-metro-north-LIRR-train-feed: helper recieved", notification, payload);
             if (notification === 'GTFS_STARTUP') await this.startup(payload);
             if (notification === 'GTFS_QUERY_SEARCH') await this.query(payload.gtfs_config, payload.query);
             if (notification === 'GTFS_BROADCAST') await this.broadcast();
@@ -43,11 +43,11 @@ module.exports = NodeHelper.create(
             this.watch = [];
             // Import the data. Send a notification when ready.
             if (this.gtfs_config === undefined) {
-                Log.log("MMM-transitfeed: Importing with " + gtfs_config);
+                Log.log("MMM-metro-north-LIRR-train-feed: Importing with " + gtfs_config);
                 this.gtfs_config = gtfs_config
                 await this.gtfs.importGtfs(this.gtfs_config);
                 this.gtfs.getRoutes({}, ['route_long_name', 'route_id']);
-                Log.log("MMM-transitfeed: Done importing!");
+                Log.log("MMM-metro-north-LIRR-train-feed: Done importing!");
 
                 // Start broadcasting the stations & routes we're watching.
                 setInterval(() => this.broadcast(), 1000 * 60 * 1);
@@ -74,7 +74,7 @@ module.exports = NodeHelper.create(
                     }
                 }
             }
-            Log.log("MMM-transitfeed: evaluated", query);
+            Log.log("MMM-metro-north-LIRR-train-feed: evaluated", query);
             this.watch.push(query);
         },
         broadcast: async function () {
@@ -132,7 +132,7 @@ module.exports = NodeHelper.create(
             results = Object.values(results);
 
             // Now we have everything we need.
-            Log.log("MMM-transitfeed: Sending " + results.length + " trips; "
+            Log.log("MMM-metro-north-LIRR-train-feed: Sending " + results.length + " trips; "
                 + realtime_count + " have realtime data; processed in "
                 + (Date.now() - start_time) + "ms");
             this.sendSocketNotification("GTFS_QUERY_RESULTS", results);

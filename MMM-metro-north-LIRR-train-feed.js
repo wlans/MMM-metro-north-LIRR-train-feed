@@ -1,5 +1,5 @@
 /* MagicMirror²
- * Module: MMM-transitfeed
+ * Module: MMM-metro-north-LIRR-train-feed
  * A generic transit parser to display upcoming departures
  * for a selected set of lines
  *
@@ -7,7 +7,7 @@
  * MIT Licensed.
  */
 
-Module.register("MMM-transitfeed", {
+Module.register("MMM-metro-north-LIRR-train-feed", {
     // Default module config.
     defaults: {
         // GTFS data to load - this is the config object described in:
@@ -188,7 +188,7 @@ Module.register("MMM-transitfeed", {
             this.loading = false;
             this.updateDom();
             // Set up the helper to send us data.
-            Log.log("MMM-transitfeed: Querying");
+            Log.log("MMM-metro-north-LIRR-train-feed: Querying");
             Log.log(this.config.queries);
             for (query of this.config.queries) {
                 this.sendSocketNotification("GTFS_QUERY_SEARCH",
@@ -197,15 +197,15 @@ Module.register("MMM-transitfeed", {
             this.sendSocketNotification("GTFS_BROADCAST");
         }
         if (notification == "GTFS_QUERY_RESULTS") {
-            Log.log("MMM-transitfeed: got a query response");
+            Log.log("MMM-metro-north-LIRR-train-feed: got a query response");
             // Times don't survive the JSON serialization - need to recover them.
-            Log.log("MMM-transitfeed: ", payload);
+            Log.log("MMM-metro-north-LIRR-train-feed: ", payload);
             this.updateDepartures(payload);
         }
     },
 
     updateDepartures: function (trips) {
-        Log.log("MMM-transitfeed: " + trips.length + " trips in queue");
+        Log.log("MMM-metro-north-LIRR-train-feed: " + trips.length + " trips in queue");
 
         sortFunc = (one, two) => {
             // Alphabetize by station names if they're displayed.
